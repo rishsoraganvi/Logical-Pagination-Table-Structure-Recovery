@@ -1,0 +1,62 @@
+# Environment variables
+.env
+
+# Docker
+.docker/
+# Note: docker-compose.override.yml is for local dev only and should be ignored
+# but we'll keep it in git as it's part of the project template
+# docker-compose.override.yml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.cover
+*.log
+.env.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+logs
+node_modules
+
+# Data and models (runtime generated, too large for git)
+data/
+models/
+# Sample data if present - adjust path as needed
+# docs/../doc_000.pdf
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.komodoproject
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.swp
+*~
+
+# Claude Code internal directories (should not be committed)
+.claude/
+
+# Local docker compose override (for development only)
+docker-compose.override.yml

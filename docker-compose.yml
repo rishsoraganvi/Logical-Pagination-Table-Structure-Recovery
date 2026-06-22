@@ -1,0 +1,138 @@
+version: "3.9"
+
+networks:
+  loan-net:
+    driver: bridge
+
+volumes:
+  data:
+    driver: local
+  models:
+    driver: local
+  ollama-data:
+    driver: local
+
+services:
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    networks: [loan-net]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  ocr-worker:
+    build:
+      context: ./services/ocr-worker
+      dockerfile: Dockerfile
+    container_name: ocr-worker
+    networks: [loan-net]
+    volumes:
+      - data:/data
+    env_file: .env
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  tatr-worker:
+    build:
+      context: ./services/tatr-worker
+      dockerfile: Dockerfile
+    container_name: tatr-worker
+    networks: [loan-net]
+    volumes:
+      - data:/data
+      - models:/models:ro
+    env_file: .env
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s       # TATR model load takes ~30s
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    networks: [loan-net]
+    volumes:
+      - ollama-data:/root/.ollama
+    env_file: .env
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s      # Model load time
+
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    container_name: api
+    networks: [loan-net]
+    # No direct port exposure - only accessible via nginx
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      ocr-worker:
+        condition: service_healthy
+      tatr-worker:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    networks: [loan-net]
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+    # Health check for nginx (optional)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

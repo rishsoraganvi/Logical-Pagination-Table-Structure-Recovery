@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Document IDP Pipeline</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Loan Document IDP Pipeline</h1>
+            <p>Intelligent Document Processing for loan file analysis</p>
+        </header>
+
+        <main>
+            <section class="upload-section">
+                <h2>Upload Loan Document PDF</h2>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="pdfFile">Select PDF File:</label>
+                        <input type="file" id="pdfFile" name="file" accept="application/pdf" required>
+                        <small>Maximum file size: 500MB</small>
+                    </div>
+                    <button type="submit" id="uploadBtn">Process Document</button>
+                </form>
+
+                <div id="uploadStatus" class="status-section hidden">
+                    <h3>Processing Status</h3>
+                    <div id="statusContent">
+                        <p id="statusText">Uploading file...</p>
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill"></div>
+                        </div>
+                        <p id="statusDetails"></p>
+                    </div>
+                </div>
+
+                <div id="resultsSection" class="results-section hidden">
+                    <h2>Processing Results</h2>
+                    <div id="resultsContent"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Powered by Loan Document IDP Pipeline</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
