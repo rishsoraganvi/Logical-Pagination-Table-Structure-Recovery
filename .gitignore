@@ -60,3 +60,6 @@ Thumbs.db
 
 # Local docker compose override (for development only)
 docker-compose.override.yml
+
+vultr-deployment-runbook.md
+guide/
