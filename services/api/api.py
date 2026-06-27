@@ -4,10 +4,9 @@ FastAPI application factory and configuration.
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from api.config import get_settings
-from api.routers import health, pipeline, interface
+from api.routers import health, pipeline
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
@@ -30,13 +29,7 @@ def create_app() -> FastAPI:
 
     # Include routers
     app.include_router(health.router, tags=["health"])
-    app.include_router(pipeline.router, prefix="/pipeline", tags=["pipeline"])
-    app.include_router(interface.router, tags=["interface"])
-
-    # Mount static files
-    static_dir = os.path.join(os.path.dirname(__file__), "static")
-    if os.path.exists(static_dir):
-        app.mount("/static", StaticFiles(directory=static_dir), name="static")
+    app.include_router(pipeline.router, prefix="/api/pipeline", tags=["pipeline"])
 
     return app
 

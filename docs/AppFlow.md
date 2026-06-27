@@ -10,7 +10,7 @@ Describes every data movement from PDF upload to final JSON output. Read alongsi
 ## 1. Top-Level Request Lifecycle
 
 ```
-Client (curl / demo UI)
+Client (curl / demo UI / Streamlit UI)
         │
         │  POST /pipeline/run   (multipart PDF)
         ▼

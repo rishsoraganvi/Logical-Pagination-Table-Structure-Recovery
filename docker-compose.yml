@@ -57,6 +57,7 @@ services:
     volumes:
       - data:/data
       - models:/models:ro
+      - models:/models:ro
     env_file: .env
     deploy:
       resources:
@@ -115,6 +116,23 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  streamlit:
+    build:
+      context: ./services/streamlit
+      dockerfile: Dockerfile
+    container_name: streamlit
+    networks: [loan-net]
+    env_file: .env
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
       interval: 10s
       timeout: 5s
       retries: 5
